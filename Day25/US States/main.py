@@ -1,4 +1,6 @@
 import turtle
+
+import pandas
 import pandas as pd
 
 screen = turtle.Screen()
@@ -27,11 +29,9 @@ guessed_states = []
 
 while len(guessed_states) < 50:
     if answer_state == "exit":
-        missing_states = []
-        for state in states["state"].to_list():
-            if state not in guessed_states:
-                missing_states.append(state)
-        print(missing_states)
+        missing_states = [state for state in states["state"].to_list() if state not in guessed_states]
+        new_data = pandas.DataFrame(missing_states)
+        new_data.to_csv("states_to_learn.csv")
         break
     for place in states["state"]:
         if answer_state.lower() == place.lower():
