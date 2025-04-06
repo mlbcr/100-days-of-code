@@ -43,7 +43,7 @@ def start_time():
             count_down(SHORT_BREAK_MIN * 60)
         else:
             label_timer.config(text="Working", fg=GREEN, font=(FONT_NAME, 40, "bold"))
-            count_down(1 * 60)
+            count_down(WORK_MIN * 60)
     else:
         count_down(time_remaining)
 
