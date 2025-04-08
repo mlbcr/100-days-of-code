@@ -1,6 +1,8 @@
 from tkinter import *
 import pandas as pd
 from random import choice
+import os
+
 
 BACKGROUND_COLOR = "#B1DDC6"
 FONT_NAME = "Arial"
@@ -61,24 +63,32 @@ text_word = None
 # Data
 current_translation = ""
 words_df = None
-
+canvas_image_id = None
+front_image = None
+back_image = None
 # ----------------------------- FLASHCARDS --------------------------------------------
 
 def start_flashcards():
-    global words_df, canvas, button_right, button_wrong, text_language, text_word
+    global words_df, canvas, button_right, button_wrong, text_language, text_word, canvas_image_id, front_image, back_image
 
     label_choose_language.pack_forget()
     language_frame.pack_forget()
     start_button.pack_forget()
 
     selected_language = language_var.get()
-    file_path = f"data/{selected_language}_words.csv"
-    words_df = pd.read_csv(file_path)
+    original_file_path = f"data/{selected_language}_words.csv"
+    progress_file_path = f"data/{selected_language}_words_to_learn.csv"
+
+    if os.path.exists(progress_file_path):
+        words_df = pd.read_csv(progress_file_path)
+    else:
+        words_df = pd.read_csv(original_file_path)
 
     canvas = Canvas(width=800, height=526, bg=BACKGROUND_COLOR, highlightthickness=0)
-    card_image = PhotoImage(file="images/card_front.png")
-    canvas.create_image(400, 263, image=card_image)
-    canvas.image = card_image
+    front_image = PhotoImage(file="images/card_front.png")
+    back_image = PhotoImage(file="images/card_back.png")
+    canvas_image_id = canvas.create_image(400, 263, image=front_image)
+    canvas.image = front_image
 
     text_language = canvas.create_text(400, 163, text="", fill="black", font=(FONT_NAME, 40))
     text_word = canvas.create_text(400, 263, text="", fill="black", font=(FONT_NAME, 60, "bold"))
@@ -98,17 +108,26 @@ def start_flashcards():
 
 def create_flashcard():
     global current_translation
+
+    if words_df.empty:
+        canvas.itemconfig(canvas_image_id, image=front_image)
+        canvas.itemconfig(text_language, text="🎉 Done!", fill="black")
+        canvas.itemconfig(text_word, text="You learned all words!", fill="black")
+        return
+
     row = words_df.sample().iloc[0]
     foreign_word = row.iloc[0]
     english_word = row.iloc[1]
     current_translation = english_word
-    canvas.itemconfig(text_word, text=foreign_word)
-    canvas.itemconfig(text_language, text="Korean" if language_var.get() == "korean" else "French")
+    canvas.itemconfig(canvas_image_id, image=front_image)  # volta para frente
+    canvas.itemconfig(text_word, text=foreign_word, fill="black")
+    canvas.itemconfig(text_language, text="Korean" if language_var.get() == "korean" else "French", fill="black")
 
 
 def show_translation():
-    canvas.itemconfig(text_word, text=current_translation)
-    canvas.itemconfig(text_language, text="English")
+    canvas.itemconfig(canvas_image_id, image=back_image)  # muda para verso
+    canvas.itemconfig(text_word, text=current_translation, fill="white")
+    canvas.itemconfig(text_language, text="English", fill="white")
 
 
 def hit():
