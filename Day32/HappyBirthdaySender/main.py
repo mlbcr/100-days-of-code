@@ -5,8 +5,8 @@ import pandas as pd
 
 letters = ['letter_1.txt', 'letter_2.txt', 'letter_3.txt']
 
-my_email = 'mlbcr123@gmail.com'
-password = 'zuanlxmnthawfztd'
+my_email = 'myemail'
+password = 'mypass'
 
 now = dt.datetime.now()
 date = (now.month, now.day)
